@@ -1,0 +1,3 @@
+/* link-quick-actions adds items to Obsidian's own editor context menu and
+   renders no UI of its own. Kept so the release contract (main.js +
+   manifest.json + styles.css) is satisfied. */
