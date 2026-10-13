@@ -39,6 +39,7 @@ Right-click a link in **Live Preview** to toggle its embed bang, or delete it.
 
 | 设置 | 默认 | 说明 |
 |---|---|---|
+| 界面语言 | 中文 | 「自动（跟随 Obsidian）」/ 中文 / English |
 | 显示「切换叹号」 | 开 | 关掉后菜单里不再出现这一项 |
 | 显示「删除链接」 | 开 | 同上 |
 
@@ -77,6 +78,12 @@ Edits go through Obsidian's editor API, so **undo works**.
 ### Requirements
 
 None beyond Obsidian ≥ 1.8.7. No Canvas, no Excalidraw.
+
+### Language
+
+The interface is available in Chinese and English. The setting has three values — **Automatic** (follow Obsidian's own language), **中文**, and **English** — and ships defaulting to Chinese.
+
+Detection reads `localStorage["language"]` (the key Obsidian itself uses) and falls back to `window.moment.locale()`, then to the OS locale. Any non-Chinese language resolves to English.
 
 ### Live Preview only
 

@@ -60,6 +60,7 @@ import {
 	type TextEdit,
 } from "./links";
 import { collectDomTargets, isElementLike } from "./dom";
+import { setLanguage, t } from "./i18n";
 import {
 	DEFAULT_SETTINGS,
 	LinkQuickActionsSettingTab,
@@ -93,6 +94,7 @@ export default class LinkQuickActionsPlugin extends Plugin {
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
+		setLanguage(this.settings.language);
 		this.addSettingTab(new LinkQuickActionsSettingTab(this.app, this));
 
 		// Capture phase, so this runs before Obsidian's own contextmenu work.
@@ -107,7 +109,7 @@ export default class LinkQuickActionsPlugin extends Plugin {
 			this.app.workspace.on("editor-menu", this.onEditorMenu)
 		);
 
-		console.log("[link-quick-actions] 已加载");
+		console.log("[link-quick-actions] " + t("log.loaded"));
 	}
 
 	// -- click capture -----------------------------------------------------
@@ -254,10 +256,11 @@ export default class LinkQuickActionsPlugin extends Plugin {
 		}
 
 		if (file || clicked) {
-			console.warn(
-				"[link-quick-actions] 右键了链接/嵌入，但正文里找不到对应链接",
-				{ file: file?.path ?? null, clicked: Boolean(clicked), offset }
-			);
+			console.warn("[link-quick-actions] " + t("log.linkNotFound"), {
+				file: file?.path ?? null,
+				clicked: Boolean(clicked),
+				offset,
+			});
 		}
 		return null;
 	}
@@ -294,10 +297,7 @@ export default class LinkQuickActionsPlugin extends Plugin {
 			);
 			return destination?.path === file.path;
 		} catch (error) {
-			console.error(
-				"[link-quick-actions] getFirstLinkpathDest 失败",
-				error
-			);
+			console.error("[link-quick-actions] " + t("log.resolveFailed"), error);
 			return false;
 		}
 	}
@@ -377,11 +377,7 @@ export default class LinkQuickActionsPlugin extends Plugin {
 			added = true;
 			menu.addItem((item) =>
 				item
-					.setTitle(
-						span.bang
-							? "去掉叹号（改为普通链接）"
-							: "加上叹号（改为嵌入）"
-					)
+					.setTitle(t(span.bang ? "menu.removeBang" : "menu.addBang"))
 					.setIcon(span.bang ? "link" : "image")
 					.onClick(() => {
 						this.applyEdit(editor, text, toggleBangEdit(span));
@@ -393,7 +389,7 @@ export default class LinkQuickActionsPlugin extends Plugin {
 			added = true;
 			menu.addItem((item) =>
 				item
-					.setTitle("删除这个链接")
+					.setTitle(t("menu.deleteLink"))
 					.setIcon("trash-2")
 					.onClick(() => {
 						this.applyEdit(editor, text, removeLinkEdit(span));
@@ -420,8 +416,8 @@ export default class LinkQuickActionsPlugin extends Plugin {
 				toEditorPosition(editor, text, edit.to)
 			);
 		} catch (error) {
-			console.error("[link-quick-actions] 改写链接失败", error);
-			new Notice("改写链接失败，详情见控制台。");
+			console.error("[link-quick-actions] " + t("log.editFailed"), error);
+			new Notice(t("notice.editFailed"));
 		}
 	}
 
@@ -466,7 +462,7 @@ function resolveOffset(
 				if (Number.isFinite(position) && position >= 0) return position;
 			} catch (error) {
 				console.error(
-					"[link-quick-actions] posAtDOM 失败，尝试下一个候选",
+					"[link-quick-actions] " + t("log.posAtDomFailed"),
 					error
 				);
 			}
@@ -478,7 +474,7 @@ function resolveOffset(
 	try {
 		return editor.posToOffset(editor.getCursor());
 	} catch (error) {
-		console.error("[link-quick-actions] posToOffset 失败", error);
+		console.error("[link-quick-actions] " + t("log.posToOffsetFailed"), error);
 		return null;
 	}
 }
@@ -503,7 +499,7 @@ function toEditorPosition(
 		return editor.offsetToPos(offset);
 	} catch (error) {
 		console.error(
-			"[link-quick-actions] offsetToPos 失败，用本地换算兜底",
+			"[link-quick-actions] " + t("log.offsetToPosFailed"),
 			error
 		);
 		return offsetToLineCh(text, offset);

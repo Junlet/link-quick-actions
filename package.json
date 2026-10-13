@@ -1,6 +1,6 @@
 {
   "name": "link-quick-actions",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Right-click a link in Live Preview to toggle its embed bang or delete it.",
   "main": "main.js",
   "scripts": {
